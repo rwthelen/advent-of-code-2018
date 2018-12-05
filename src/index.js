@@ -2,9 +2,9 @@ const util = require("util");
 const fs = require("fs");
 const readFile = util.promisify(fs.readFile);
     
-const Day01Solution = require("./day01/day01");
-const Day02Solution = require("./day02/day02");
-const Day03Solution = require("./day03/day03");
+const Day01Solution = require("./day01");
+const Day02Solution = require("./day02");
+const Day03Solution = require("./day03");
 
 async function getInput(inputPath) {
     let input = await readFile(inputPath, "utf8")
