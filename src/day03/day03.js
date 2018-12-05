@@ -1,7 +1,3 @@
-const util = require("util");
-const fs = require("fs");
-const readFile = util.promisify(fs.readFile);
-
 class Solution {
     constructor(input){
         this.input = this.mapInput(input);
@@ -64,18 +60,26 @@ class Solution {
     }
 }
 
-async function getInput(inputPath) {
-    let input = await readFile(inputPath, "utf8");
-    input = input
-        .split("\n");
-    return input;
+if (require.main === module) {
+    const util = require("util");
+    const fs = require("fs");
+    const readFile = util.promisify(fs.readFile);
+
+    async function getInput(inputPath) {
+        let input = await readFile(inputPath, "utf8");
+        input = input
+            .split("\n");
+        return input;
+    }
+    
+    async function main() {
+        const input = await getInput(__dirname + "/../../input/day03.txt");
+        const solution = new Solution(input);
+        solution.markClaims();
+        solution.findStandaloneClaim();
+    }
+    
+    main();
 }
 
-async function main() {
-    const input = await getInput("../../input/day03.txt");
-    const solution = new Solution(input);
-    solution.markClaims();
-    solution.findStandaloneClaim();
-}
-
-main();
+module.exports = Solution;

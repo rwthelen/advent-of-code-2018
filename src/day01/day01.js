@@ -1,11 +1,7 @@
-const util = require("util");
-const fs = require("fs");
-const readFile = util.promisify(fs.readFile);
-
 class Solution {
     constructor(input){
         this.frequency = 0;
-        this.input = input;
+        this.input = input.map((frequencyChange) => parseInt(frequencyChange));
         this.frequencyLog = [this.frequency];
         this.repeatedFrequency = null;
     }
@@ -34,19 +30,25 @@ class Solution {
     }
 }
 
-async function getInput(inputPath) {
-    let input = await readFile(inputPath, "utf8");
-    input = input
-        .split("\n")
-        .map((frequencyChange) => parseInt(frequencyChange));
-    return input;
+if (require.main === module) {
+    const util = require("util");
+    const fs = require("fs");
+    const readFile = util.promisify(fs.readFile);
+
+    async function getInput(inputPath) {
+        let input = await readFile(inputPath, "utf8")
+            .then((input) => input.split("\n"))
+        return input;
+    }
+    
+    async function main() {
+        const input = await getInput(__dirname + "/../../input/day01.txt");
+        const solution = new Solution(input);
+        solution.calculateFrequency();
+        solution.calibrateFrequency();
+    }
+
+    main();
 }
 
-async function main() {
-    const input = await getInput("../../input/day01.txt");
-    const solution = new Solution(input);
-    solution.calculateFrequency();
-    solution.calibrateFrequency();
-}
-
-main();
+module.exports = Solution;

@@ -1,8 +1,4 @@
-const util = require("util");
-const fs = require("fs");
-const readFile = util.promisify(fs.readFile);
-
-class BoxChecker {
+class Solution {
     constructor(input){
         this.input = input;
         this.analyzedInput = this.input.map((boxID) => this.analyzeBoxID(boxID));
@@ -54,18 +50,26 @@ class BoxChecker {
     }
 }
 
-async function getInput(inputPath) {
-    let input = await readFile(inputPath, "utf8");
-    input = input
-        .split("\n");
-    return input;
+if (require.main === module) {
+    const util = require("util");
+    const fs = require("fs");
+    const readFile = util.promisify(fs.readFile);
+
+    async function getInput(inputPath) {
+        let input = await readFile(inputPath, "utf8");
+        input = input
+            .split("\n");
+        return input;
+    }
+    
+    async function main() {
+        const input = await getInput(__dirname + "/../../input/day02.txt");
+        const solution = new Solution(input);
+        solution.calculateChecksum();
+        solution.findBoxes();
+    }
+    
+    main();
 }
 
-async function main() {
-    const input = await getInput("../../input/day02.txt");
-    const solution = new BoxChecker(input);
-    solution.calculateChecksum();
-    solution.findBoxes();
-}
-
-main();
+module.exports = Solution;
