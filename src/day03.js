@@ -73,7 +73,7 @@ if (require.main === module) {
     }
     
     async function main() {
-        const input = await getInput(__dirname + "/../../input/day03.txt");
+        const input = await getInput(__dirname + "/../input/day03.txt");
         const solution = new Solution(input);
         solution.markClaims();
         solution.findStandaloneClaim();

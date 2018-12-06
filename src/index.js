@@ -5,6 +5,7 @@ const readFile = util.promisify(fs.readFile);
 const Day01Solution = require("./day01");
 const Day02Solution = require("./day02");
 const Day03Solution = require("./day03");
+const Day04Solution = require("./day04");
 
 async function getInput(inputPath) {
     let input = await readFile(inputPath, "utf8")
@@ -31,6 +32,12 @@ async function main() {
     const day03 = new Day03Solution(day03Input);
     day03.markClaims();
     day03.findStandaloneClaim();
+
+    console.log("\nDay 04:")
+    const day04Input = await getInput("./input/day04.txt");
+    const day04 = new Day04Solution(day04Input);
+    day04.strategy1();
+    day04.strategy2();
 }
 
 main();
