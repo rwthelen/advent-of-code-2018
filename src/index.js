@@ -6,6 +6,7 @@ const Day01Solution = require("./day01");
 const Day02Solution = require("./day02");
 const Day03Solution = require("./day03");
 const Day04Solution = require("./day04");
+const Day05Solution = require("./day05");
 
 async function getInput(inputPath) {
     let input = await readFile(inputPath, "utf8")
@@ -19,7 +20,7 @@ async function main() {
     const day01 = new Day01Solution(day01Input);
     day01.calculateFrequency();
     console.log("Skipping Day 1, Part 2...")
-    // day01.calibrateFrequency(); // too slow
+    day01.calibrateFrequency(); // TODO: optimize
 
     console.log("\nDay 02:")
     const day02Input = await getInput("./input/day02.txt");
@@ -38,6 +39,12 @@ async function main() {
     const day04 = new Day04Solution(day04Input);
     day04.strategy1();
     day04.strategy2();
+
+    console.log("\nDay 05:")
+    const day05Input = await getInput("./input/day05.txt");
+    const day05 = new Day05Solution(day05Input);
+    day05.scanPolymer(); // TODO: optimize
+    day05.produceShortestPolymer(); // TODO: optimize
 }
 
 main();
