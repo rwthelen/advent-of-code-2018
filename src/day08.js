@@ -1,17 +1,15 @@
-// Length of A: 16
-// Length of B: 5 (header.length + metadata)
-// Length of C: 6 (header.length + metadata + child.header.length + child.metadata)
-// Length of D: 3
-
 const assert = require("assert");
 const util = require("util");
 const fs = require("fs");
 const readFile = util.promisify(fs.readFile);
 
+const HEADER_LENGTH = 2;
+
 class Node {
   constructor(input) {
     this.input = input.split(" ").map(str => parseInt(str));
-    this.header = this.parseHeader();
+    this.numNodes = this.input[0];
+    this.numMetadataEntries = this.input[1];
     this.childNodes = [];
     this.metadata = [];
 
@@ -19,20 +17,14 @@ class Node {
     this.parseMetadata();
   }
 
-  get lengthOfAllChildren() {
-    let lengthOfAllChildren;
-    if (this.childNodes.length > 0) {
-      lengthOfAllChildren = this.childNodes
-        .map(child => child.length)
-        .reduce((sum, child) => sum + child);
-    } else {
-      lengthOfAllChildren = 0;
-    }
-    return lengthOfAllChildren;
+  get lengthOfChildNodes() {
+    return this.childNodes
+      .map(child => child.length)
+      .reduce((sum, child) => sum + child, 0);
   }
 
   get length() {
-    return 2 + this.lengthOfAllChildren + this.header.numMetadataEntries;
+    return HEADER_LENGTH + this.lengthOfChildNodes + this.numMetadataEntries;
   }
 
   get sumMetadata() {
@@ -43,43 +35,36 @@ class Node {
     if (this.childNodes.length === 0) {
       return this.sumMetadata;
     } else {
-      let value = 0;
-      for (const entry of this.metadata) {
-        const child = this.childNodes[entry - 1];
-        if (child) {
-          value += child.value;
-        }
-      }
-      return value;
+      return this.metadata
+        .map(n => this.childNodes[n - 1])
+        .filter(child => child !== undefined)
+        .map(child => child.value)
+        .reduce((sum, value) => sum + value, 0);
     }
   }
 
   sumAllMetadata() {
-    let sum = this.sumMetadata;
-    for (const child of this.childNodes) {
-      sum += child.sumAllMetadata();
-    }
-    return sum;
-  }
-
-  parseHeader() {
-    const [numNodes, numMetadataEntries] = this.input.slice(0, 2);
-    return { numNodes, numMetadataEntries };
+    return this.childNodes
+      .map(child => child.sumAllMetadata())
+      .reduce((sum, current) => sum + current, this.sumMetadata);
   }
 
   parseMetadata() {
-    this.metadata = this.input.slice(2 + this.lengthOfAllChildren, this.length);
+    this.metadata = this.input.slice(
+      HEADER_LENGTH + this.lengthOfChildNodes,
+      this.length
+    );
   }
 
   parseChildNodes() {
-    if (this.header.numNodes === 0) {
+    if (this.numNodes === 0) {
       return;
     } else {
-      for (let i = 0; i < this.header.numNodes; i++) {
-        while (this.childNodes.length < this.header.numNodes) {
+      for (let i = 0; i < this.numNodes; i++) {
+        while (this.childNodes.length < this.numNodes) {
           let input = this.input.slice(
-            2 + this.lengthOfAllChildren,
-            this.input.length - this.header.numNodes
+            HEADER_LENGTH + this.lengthOfChildNodes,
+            this.input.length - this.numMetadataEntries
           );
           let child = new Node(input.join(" "));
           this.childNodes.push(child);
@@ -89,31 +74,41 @@ class Node {
   }
 }
 
+function part1(input) {
+  const tree = new Node(input);
+  return tree.sumAllMetadata();
+}
+
 async function testPart1() {
-  const TEST_INPUT = "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2";
-  const tree = new Node(TEST_INPUT);
-  assert.equal(tree.sumAllMetadata(), 138);
+  const input = "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2";
+  const solution = part1(input);
+  assert.equal(solution, 138);
 }
 
 async function solvePart1() {
   const input = await readFile(__dirname + "/../input/day08.txt", "utf8");
+  const solution = part1(input);
+  console.log(solution);
+}
+
+function part2(input) {
   const tree = new Node(input);
-  console.log(tree.sumAllMetadata());
+  return tree.value;
 }
 
 async function testPart2() {
-  const NODE_C = "1 1 0 1 99 2";
-  const treeC = new Node(NODE_C);
-  assert.equal(treeC.value, 0);
-  const NODE_A = "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2";
-  const treeA = new Node(NODE_A);
-  assert.equal(treeA.value, 66);
+  const input1 = "1 1 0 1 99 2";
+  const test1 = part2(input1);
+  assert.equal(test1, 0);
+  const input2 = "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2";
+  const test2 = part2(input2);
+  assert.equal(test2, 66);
 }
 
 async function solvePart2() {
   const input = await readFile(__dirname + "/../input/day08.txt", "utf8");
-  const tree = new Node(input);
-  console.log(tree.value);
+  const solution = part2(input);
+  console.log(solution);
 }
 
 if (require.main === module) {
