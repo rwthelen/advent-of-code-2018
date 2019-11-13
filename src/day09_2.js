@@ -1,71 +1,46 @@
 const assert = require("assert");
-const { PerformanceObserver, performance } = require("perf_hooks");
-
-const obs = new PerformanceObserver(items => {
-  // console.log(items.getEntries()[0].duration);
-  performance.clearMarks();
-});
-obs.observe({ entryTypes: ["measure"] });
 
 class CircularLinkedList {
   constructor() {
-    this.head = null;
-    this.tail = null;
     this.current = null;
-    this.length = 0;
-  }
-
-  add(value) {
-    const node = new Node(value);
-    if (this.head == null) {
-      this.head = node;
-      this.tail = node;
-      node.next = this.head;
-    } else {
-      const prevTail = this.tail;
-      prevTail.next = node;
-      node.prev = prevTail;
-      node.next = this.head;
-      this.tail = node;
-      this.head.prev = node;
-    }
-    this.length += 1;
   }
 
   insert(value) {
     const node = new Node(value);
-    node.prev = this.current;
-    node.next = this.current.next;
+    if (this.current == null) {
+      // Insert the new node into the linked list as the only node
+      // The new node has circular references to itself as prev and next
+      this.current = node;
+      node.next = this.current;
+      node.prev = this.current;
+    } else {
+      // Set prev and next on the new node
+      node.prev = this.current;
+      node.next = this.current.next;
 
-    this.current.next.prev = node;
-    this.current.next = node;
-    this.current = node;
+      // Insert the new node into the linked list
+      this.current.next.prev = node;
+      this.current.next = node;
+      this.current = node;
+    }
   }
 
   remove() {
     const removed = this.current;
-    const left = removed.prev;
-    const right = removed.next;
-    left.next = right;
-    right.prev = left;
-    this.current = right;
+    // Update the surrounding nodes to skip the current node
+    removed.prev.next = removed.next;
+    removed.next.prev = removed.prev;
+
+    this.current = removed.next;
     return removed;
   }
 
   next() {
-    if (this.current) {
-      this.current = this.current.next;
-    } else {
-      this.current = this.head;
-    }
+    this.current = this.current.next;
   }
 
   prev() {
-    if (this.current) {
-      this.current = this.current.prev;
-    } else {
-      this.current = this.head;
-    }
+    this.current = this.current.prev;
   }
 }
 
@@ -92,15 +67,12 @@ class Game {
     };
     // set up linked list
     this.circle = new CircularLinkedList();
-    this.circle.add(this.marbles.pop());
+    this.circle.insert(this.marbles.pop());
     this.circle.next(); // hacky, sets current to head
   }
 
   placeNextMarble() {
-    performance.mark("A");
     const marble = this.marbles.pop();
-    performance.mark("B");
-    performance.measure("A to B", "A", "B");
     if (marble % 23 === 0) {
       for (let i = 0; i < 7; i++) {
         this.circle.prev();
