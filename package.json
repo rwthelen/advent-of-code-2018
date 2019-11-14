@@ -2,20 +2,13 @@
   "name": "advent-of-code-2018",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rwthelen/advent-of-code-2018.git"
   },
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/rwthelen/advent-of-code-2018/issues"
-  },
-  "homepage": "https://github.com/rwthelen/advent-of-code-2018#readme",
+  "homepage": "https://github.com/rwthelen/advent-of-code-2018",
   "devDependencies": {
     "eslint": "^6.6.0"
   }
